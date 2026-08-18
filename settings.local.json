@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node \"C:/Users/Egor/AppData/Local/Temp/claude/C--Users-Egor-Desktop-site/aa77232f-9224-4b2c-a2a3-86849f078c76/scratchpad/static.mjs\")",
+      "Bash(node \"C:/Users/Egor/AppData/Local/Temp/claude/C--Users-Egor-Desktop-site/aa77232f-9224-4b2c-a2a3-86849f078c76/scratchpad/test-lib.mjs\")",
+      "Bash(sed -i \"s#'C:/Users/Egor/Desktop/site/api/_lib/#'file:///C:/Users/Egor/Desktop/site/api/_lib/#g\" test-lib.mjs)",
+      "Bash(node test-lib.mjs)",
+      "Bash(python -c ' *)",
+      "Bash(node -e ' *)",
+      "Bash(node test-create-payment.mjs)",
+      "Bash(node test-webhook.mjs)",
+      "Bash(netstat -ano)",
+      "PowerShell(Stop-Process -Id 10788 -Force)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -X POST http://localhost:3000/api/create-payment -H \"Content-Type: application/json\" -d '{\"items\":[{\"sku\":\"cardholder-vault-white\",\"qty\":1,\"price\":1}],\"customer\":{\"fullName\":\"Тест Тестов\",\"phone\":\"89991234567\",\"email\":\"a@b.ru\",\"telegram\":\"\"},\"comment\":\"\",\"consent\":true}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/create-payment -H \"Content-Type: application/json\" -d '{\"items\":[{\"sku\":\"free-item\",\"qty\":1}],\"customer\":{\"fullName\":\"Тест Тестов\",\"phone\":\"89991234567\",\"email\":\"a@b.ru\",\"telegram\":\"\"},\"comment\":\"\",\"consent\":true}')",
+      "Bash(curl -s -X POST http://localhost:3000/api/create-payment -H \"Content-Type: application/json\" -d '{\"items\":[{\"sku\":\"cardholder-vault-white\",\"qty\":1}],\"customer\":{\"fullName\":\"Тест Тестов\",\"phone\":\"89991234567\",\"email\":\"a@b.ru\",\"telegram\":\"\"},\"comment\":\"\",\"consent\":false}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" -X POST http://localhost:3000/api/yookassa-webhook -H \"Content-Type: application/json\" -d '{\"event\":\"payment.succeeded\",\"object\":{\"id\":\"fake\"}}')"
+    ]
+  }
+}
