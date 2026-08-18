@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Vault Club | Exclusive Cardholder</title>
+    
+    <!-- Подключение шрифтов, имитирующих стиль из макетов -->
+    
+    
+    <!-- Playfair Display для заголовков (похож на шрифт в макете), Inter для текста -->
+    <!-- Локальные шрифты вынесены в общий файл, его же подключают success/fail/privacy/offer -->
+    <link rel="stylesheet" href="assets/fonts.css">
+    
+    <!-- Подключение Tailwind CSS -->
+    <!-- Tailwind Play CDN. Для продакшена заменить на собранный CSS (см. README) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Настройка конфигурации Tailwind под фирменный стиль -->
+    <script src="assets/theme.js"></script>
+
+    <style>
+        /* Базовые стили и утилиты для анимаций */
+        body {
+            background-color: #FDFBF7;
+            color: #D85427; /* Основной цвет текста по умолчанию - акцентный, как в заголовках макета */
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Плавное появление элементов при скролле */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Тонкие линии из макета */
+        .vault-divider {
+            height: 1px;
+            background-color: #EAE3DB;
+            width: 100%;
+        }
+
+        /* Стили для скроллбара (опционально, для эстетики) */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDFBF7;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D85427;
+        }
+
+        /* Прячем скроллбар у ленты галереи */
+        #gallery-track::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Убираем стрелочки у input type="number" */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Поля формы оформления заказа. Без скруглений, палитра та же. */
+        .vault-input {
+            display: block;
+            width: 100%;
+            background-color: transparent;
+            border: 1px solid #EAE3DB;
+            padding: 0.875rem 1rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 300;
+            color: #2A2626;
+            outline: none;
+            transition: border-color 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .vault-input::placeholder {
+            color: #2A2626;
+            opacity: 0.35;
+        }
+        .vault-input:focus {
+            border-color: #D85427;
+        }
+        /* Поле с ошибкой подсвечивается акцентом, как и текст ошибки под ним */
+        .vault-input.has-error {
+            border-color: #D85427;
+        }
+
+        /* Чекбокс согласия: рисуем сами, чтобы не тащить системный вид */
+        .vault-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 1rem;
+            height: 1rem;
+            border: 1px solid #EAE3DB;
+            background-color: transparent;
+            cursor: pointer;
+            transition: border-color 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .vault-checkbox:checked {
+            border-color: #D85427;
+            background-color: #D85427;
+            /* галочка внутри квадрата */
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23FDFBF7' stroke-width='2'%3E%3Cpath d='M3 8.5l3.5 3.5L13 5'/%3E%3C/svg%3E");
+            background-size: 100% 100%;
+        }
+        .vault-checkbox.has-error {
+            border-color: #D85427;
+        }
+
+        /* Текст ошибки под полем. Показывается добавлением .is-visible из JS. */
+        .field-error {
+            display: none;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: #D85427;
+        }
+        .field-error.is-visible {
+            display: block;
+        }
+
+        /* Стилизация радио-кнопок выбора цвета */
+        .color-radio:checked + label {
+            border-color: #D85427;
+            padding: 2px;
+        }
+        .color-radio:checked + label span {
+            transform: scale(0.85);
+        }
+    </style>
+</head>
+<body class="font-sans text-vault-accent">
+
+    <!-- 1. HEADER (Фиксированный) -->
+    <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-all duration-500 bg-vault-bg/90 backdrop-blur-md py-6 px-6 md:px-12 flex justify-between items-center border-b border-transparent">
+        
+        <!-- Левая часть: Меню -->
+        <nav class="hidden md:flex space-x-8 text-xs tracking-widest uppercase font-medium">
+            <a href="#product" class="hover:opacity-60 transition-opacity">Магазин</a>
+            <a href="#values" class="hover:opacity-60 transition-opacity">Философия</a>
+            <a href="#faq" class="hover:opacity-60 transition-opacity">FAQ</a>
+        </nav>
+
+        <!-- Гамбургер для мобильных (упрощенный) -->
+        <button class="md:hidden text-vault-accent">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+
+        <!-- Центр: Логотип -->
+        <a href="#" class="absolute left-1/2 transform -translate-x-1/2 whitespace-nowrap text-2xl sm:text-3xl md:text-5xl font-serif tracking-tight">
+            The Vault Club
+        </a>
+
+        <!-- Правая часть: Корзина и Профиль -->
+        <div class="flex space-x-6 text-xs tracking-widest uppercase font-medium items-center">
+            <a href="#" class="hidden md:block hover:opacity-60 transition-opacity">Admin</a>
+            <button id="cart-open-btn" class="flex items-center hover:opacity-60 transition-opacity group">
+                <span class="mr-2 hidden md:inline">Корзина</span>
+                <span id="cart-count" class="w-5 h-5 flex items-center justify-center border border-vault-accent rounded-full text-[10px] group-hover:bg-vault-accent group-hover:text-vault-bg transition-colors">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- 2. HERO СЕКЦИЯ -->
+    <section class="relative h-screen flex flex-col justify-center items-center text-center px-4 pt-20">
+        <!-- Декоративные элементы в стиле макета (тонкие линии и надписи) -->
+        <div class="absolute top-32 left-12 hidden md:flex items-center space-x-4 text-xs tracking-[0.2em] uppercase opacity-70">
+            <div class="w-8 h-[1px] bg-vault-accent"></div>
+            <span>Закрытое сообщество - By invitation only</span>
+        </div>
+
+        <div class="max-w-4xl mx-auto reveal -mt-20">
+            <h1 class="text-[2.35rem] sm:text-6xl md:text-8xl lg:text-9xl font-serif leading-none mb-8 tracking-tight">
+                Символ<br>
+                <span>Принадлежности.</span>
+            </h1>
+            <p class="text-vault-text text-lg md:text-xl font-light max-w-xl mx-auto mb-12 leading-relaxed">
+                Знак человека, который строит бизнес, развивается и мыслит масштабно. Больше, чем аксессуар.
+            </p>
+            <a href="#product" class="inline-block bg-vault-accent text-vault-bg px-10 md:px-12 py-4 md:py-5 text-sm md:text-base tracking-widest uppercase hover:bg-opacity-90 transition-all duration-300 transform hover:-translate-y-1">
+                Приобрести статус
+            </a>
+        </div>
+        
+        <!-- Индикатор скролла -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce opacity-50">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 5v14M19 12l-7 7-7-7"/>
+            </svg>
+        </div>
+    </section>
+
+    <div class="vault-divider"></div>
+
+    <!-- 3. КАРТОЧКА ТОВАРА -->
+    <section id="product" class="pt-24 md:pt-32 pb-10 md:pb-14 px-6 md:px-12 max-w-[1400px] mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-start">
+            
+            <!-- Левая колонка: Изображение -->
+            <div class="reveal relative bg-vault-accent aspect-square flex items-center justify-center p-1 md:p-2 group overflow-hidden">
+                <!-- Плейсхолдер для фото картхолдера. Замените src на реальные фото. -->
+                <!-- Используем CSS фильтры для имитации смены цвета для демо -->
+                <img id="main-product-image"
+                     src="assets/img/img-01-52614c96.webp"
+                     alt="The Vault Cardholder" 
+                     class="w-full h-full object-contain transition-transform duration-700 group-hover:scale-105">
+                
+                <div class="absolute top-6 left-6 text-xs tracking-widest uppercase text-vault-bg/70">01 / Edition</div>
+            </div>
+
+            <!-- Правая колонка: Информация -->
+            <div class="reveal flex flex-col justify-center">
+                <div class="mb-4 text-xs tracking-widest uppercase opacity-60">The Vault Collection</div>
+                <h2 class="text-4xl md:text-5xl font-serif mb-6 leading-tight">Cardholder <span class="italic text-vault-text">Vault</span></h2>
+                
+                <div class="text-2xl font-light text-vault-text mb-8">15 000 ₽</div>
+                
+                <p class="text-vault-text/80 font-light leading-relaxed mb-10 max-w-md">
+                    Лаконичный дизайн, премиальная итальянская кожа и безупречное исполнение. 
+                    Создан для тех, кто ценит эстетику минимализма и функциональность в каждой детали. 
+                    Ваш пропуск в мир привилегий.
+                </p>
+
+                <!-- Цвет -->
+                <div class="mb-10">
+                    <span class="block text-xs tracking-widest uppercase mb-4 opacity-70">Цвет: <span id="color-name-display" class="font-semibold text-vault-accent">Белый</span></span>
+                    <div class="flex space-x-4">
+                        <!-- Единственный цвет: Белый -->
+                        <div class="relative">
+                            <!-- data-sku связывает радио с записью в PRODUCTS и с каталогом на сервере -->
+                            <input type="radio" name="color" id="color-white" value="Белый" class="color-radio sr-only" checked data-sku="cardholder-vault-white">
+                            <label for="color-white" class="cursor-pointer w-10 h-10 rounded-full border border-vault-line flex items-center justify-center transition-all">
+                                <span class="w-full h-full rounded-full bg-white border border-vault-line block transition-transform duration-300"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Количество и Кнопка -->
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mb-12">
+                    <!-- Счетчик -->
+                    <div class="flex items-center border border-vault-line px-4 h-14 sm:w-1/3 justify-between">
+                        <button id="qty-minus" class="text-vault-text hover:text-vault-accent transition-colors p-2">-</button>
+                        <span id="qty-value" class="text-vault-text font-medium text-lg">1</span>
+                        <button id="qty-plus" class="text-vault-text hover:text-vault-accent transition-colors p-2">+</button>
+                    </div>
+                    
+                    <!-- Кнопка добавления -->
+                    <button id="add-to-cart-btn" class="h-14 sm:w-2/3 bg-vault-accent text-vault-bg uppercase tracking-widest text-sm hover:bg-opacity-90 transition-colors flex items-center justify-center relative overflow-hidden group">
+                        <span class="relative z-10">Добавить в корзину</span>
+                        <div class="absolute inset-0 bg-black/10 transform scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-premium"></div>
+                    </button>
+                </div>
+
+                <!-- Инфо (Доставка, Оплата) - мини аккордеон -->
+                <div class="border-t border-vault-line text-sm text-vault-text">
+                    <details class="group py-4 border-b border-vault-line cursor-pointer">
+                        <summary class="flex justify-between items-center font-medium tracking-wide uppercase text-xs">
+                            Доставка и возврат
+                            <span class="transition group-open:rotate-180">+</span>
+                        </summary>
+                        <div class="mt-4 font-light text-vault-text/80 leading-relaxed text-sm">
+                            Бесплатная курьерская доставка по Москве. Отправка по миру премиальными службами. Возврат возможен в течение 14 дней при сохранении идеального состояния.
+                        </div>
+                    </details>
+                    <details class="group py-4 border-b border-vault-line cursor-pointer">
+                        <summary class="flex justify-between items-center font-medium tracking-wide uppercase text-xs">
+                            Детали и уход
+                            <span class="transition group-open:rotate-180">+</span>
+                        </summary>
+                        <div class="mt-4 font-light text-vault-text/80 leading-relaxed text-sm">
+                            100% натуральная кожа растительного дубления. Избегайте длительного воздействия прямых солнечных лучей и влаги.
+                        </div>
+                    </details>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 3.5 ГАЛЕРЕЯ -->
+    <section id="gallery" class="pt-10 md:pt-14 pb-10 md:pb-14">
+        <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+
+            <div class="mb-20 reveal">
+                <h2 class="text-3xl md:text-5xl font-serif mb-6">Галерея</h2>
+                <div class="w-16 h-[1px] bg-vault-accent"></div>
+            </div>
+
+            <div class="reveal relative">
+                <!-- Стрелка влево -->
+                <button id="gallery-prev" aria-label="Назад"
+                        class="absolute left-2 md:left-0 top-1/2 -translate-y-1/2 md:-translate-x-1/2 z-10 w-11 h-11 md:w-12 md:h-12 rounded-full bg-vault-bg border border-vault-line flex items-center justify-center text-vault-accent hover:bg-vault-accent hover:text-vault-bg transition-colors shadow-md">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M15 18l-6-6 6-6"/>
+                    </svg>
+                </button>
+
+                <!-- Лента с квадратными фото -->
+                <div id="gallery-track" class="flex gap-4 md:gap-6 overflow-x-auto scroll-smooth snap-x snap-mandatory pb-2" style="scrollbar-width: none; -ms-overflow-style: none;">
+                    <div class="snap-start flex-shrink-0 w-64 sm:w-72 md:w-80 aspect-square bg-[#F5F2ED] overflow-hidden group">
+                        <img src="assets/img/img-02-d94fe74f.webp" alt="The Vault Club — картхолдер 1" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="snap-start flex-shrink-0 w-64 sm:w-72 md:w-80 aspect-square bg-[#F5F2ED] overflow-hidden group">
+                        <img src="assets/img/img-03-838ca31e.webp" alt="The Vault Club — картхолдер 2" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="snap-start flex-shrink-0 w-64 sm:w-72 md:w-80 aspect-square bg-[#F5F2ED] overflow-hidden group">
+                        <img src="assets/img/img-04-d38d2f50.webp" alt="The Vault Club — картхолдер 3" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="snap-start flex-shrink-0 w-64 sm:w-72 md:w-80 aspect-square bg-[#F5F2ED] overflow-hidden group">
+                        <img src="assets/img/img-05-5cb929d8.webp" alt="The Vault Club — картхолдер 4" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="snap-start flex-shrink-0 w-64 sm:w-72 md:w-80 aspect-square bg-[#F5F2ED] overflow-hidden group">
+                        <img src="assets/img/img-06-9f8f3550.webp" alt="The Vault Club — картхолдер 5" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                </div>
+
+                <!-- Стрелка вправо -->
+                <button id="gallery-next" aria-label="Вперёд"
+                        class="absolute right-2 md:right-0 top-1/2 -translate-y-1/2 md:translate-x-1/2 z-10 w-11 h-11 md:w-12 md:h-12 rounded-full bg-vault-bg border border-vault-line flex items-center justify-center text-vault-accent hover:bg-vault-accent hover:text-vault-bg transition-colors shadow-md">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3.7 ЧТО ПРОИСХОДИТ ПОСЛЕ ПОКУПКИ -->
+    <section id="process" class="pt-10 md:pt-14 pb-24 md:pb-32">
+        <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+
+            <div class="mb-20 reveal">
+                <h2 class="text-3xl md:text-5xl font-serif mb-6 leading-tight">Что происходит<br class="hidden md:block"> после покупки?</h2>
+                <div class="w-16 h-[1px] bg-vault-accent"></div>
+            </div>
+
+            <div class="space-y-16 md:space-y-0">
+
+                <!-- Этап 01 -->
+                <div class="reveal grid md:grid-cols-2 gap-8 md:gap-16 items-center md:py-16 md:border-b border-vault-line">
+                    <div class="bg-[#F5F2ED] aspect-[4/3] overflow-hidden group order-1 md:order-none">
+                        <img src="assets/img/img-07-a7367607.webp" alt="Производство" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div>
+                        <div class="text-sm tracking-widest uppercase mb-6 opacity-50">01 / Производство</div>
+                        <h3 class="text-3xl md:text-4xl font-serif mb-5">Ручная работа</h3>
+                        <p class="text-vault-text/80 font-light leading-relaxed max-w-md">
+                            Каждый картхолдер выкраивается и прошивается вручную из натуральной кожи растительного дубления. Ни одной лишней детали — только благородный материал, чистая форма и время мастера.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Этап 02 -->
+                <div class="reveal grid md:grid-cols-2 gap-8 md:gap-16 items-center md:py-16 md:border-b border-vault-line">
+                    <div class="order-1 md:order-2 bg-[#F5F2ED] aspect-[4/3] overflow-hidden group">
+                        <img src="assets/img/img-08-588bb7cd.webp" alt="Отправка" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="md:order-1">
+                        <div class="text-sm tracking-widest uppercase mb-6 opacity-50">02 / Отправка</div>
+                        <h3 class="text-3xl md:text-4xl font-serif mb-5">Путь до вашего порога</h3>
+                        <p class="text-vault-text/80 font-light leading-relaxed max-w-md">
+                            Готовое изделие бережно упаковывается и отправляется премиальной курьерской службой. Вы отслеживаете каждый шаг — от мастерской до ваших рук.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Этап 03 -->
+                <div class="reveal grid md:grid-cols-2 gap-8 md:gap-16 items-center md:py-16 md:border-b border-vault-line">
+                    <div class="bg-[#F5F2ED] aspect-[4/3] overflow-hidden group order-1 md:order-none">
+                        <img src="assets/img/img-09-b5099c1e.webp" alt="Заявка в клуб" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div>
+                        <div class="text-sm tracking-widest uppercase mb-6 opacity-50">03 / Заявка</div>
+                        <h3 class="text-3xl md:text-4xl font-serif mb-5">Отбор в сообщество</h3>
+                        <p class="text-vault-text/80 font-light leading-relaxed max-w-md">
+                            Вместе с картхолдером вы получаете доступ к закрытой анкете. Расскажите о себе и своём деле — мы отбираем тех, кто разделяет ценности и масштаб клуба.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Этап 04 -->
+                <div class="reveal grid md:grid-cols-2 gap-8 md:gap-16 items-center md:py-16">
+                    <div class="order-1 md:order-2 bg-[#F5F2ED] aspect-[4/3] overflow-hidden group">
+                        <img src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20width%3D%22800%22%20height%3D%22600%22%20viewBox%3D%220%200%20800%20600%22%3E%3Crect%20width%3D%22800%22%20height%3D%22600%22%20fill%3D%22%23D85427%22/%3E%3Ctext%20x%3D%2250%22%20y%3D%2270%22%20fill%3D%22%23FDFBF7%22%20font-family%3D%22Inter%2Csans-serif%22%20font-size%3D%2220%22%20letter-spacing%3D%223%22%20opacity%3D%220.7%22%3E04%20/%20WELCOME%3C/text%3E%3Ctext%20x%3D%22400%22%20y%3D%22320%22%20fill%3D%22%23FDFBF7%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2264%22%20text-anchor%3D%22middle%22%3EThe%20Vault%20Club%3C/text%3E%3C/svg%3E" alt="Добро пожаловать" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
+                    </div>
+                    <div class="md:order-1">
+                        <div class="text-sm tracking-widest uppercase mb-6 opacity-50">04 / Одобрение</div>
+                        <h3 class="text-3xl md:text-4xl font-serif mb-5">Добро пожаловать в The Vault Club</h3>
+                        <p class="text-vault-text/80 font-light leading-relaxed max-w-md">
+                            Заявка одобрена — двери открыты. Закрытые встречи, живой нетворкинг и окружение вашего уровня. Теперь вы часть тех, кто создаёт будущее.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. БЛОК ЦЕННОСТЕЙ -->
+    <section id="values" class="bg-[#F5F2ED] py-24 md:py-32">
+        <div class="max-w-[1400px] mx-auto px-6 md:px-12">
+            
+            <div class="mb-20 reveal">
+                <h2 class="text-3xl md:text-5xl font-serif mb-6">Философия клуба</h2>
+                <div class="w-16 h-[1px] bg-vault-accent"></div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-px bg-vault-line">
+                
+                <!-- Карточка 1 -->
+                <div class="bg-[#F5F2ED] p-12 md:p-20 group relative overflow-hidden reveal transition-colors duration-500 hover:bg-vault-bg">
+                    <div class="text-sm tracking-widest uppercase mb-12 opacity-50">01 / Идея</div>
+                    <h3 class="text-3xl font-serif mb-6 transform group-hover:-translate-y-2 transition-transform duration-500">Сообщество</h3>
+                    <p class="text-vault-text font-light leading-relaxed mt-6 md:mt-0 transition-all duration-500 md:absolute md:bottom-20 md:left-20 md:right-20 md:opacity-0 md:transform md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+                        Вы приобретаете не предмет, а ключ. Картхолдер The Vault — это узнаваемый знак среди тех, кто разделяет ваши амбиции и масштаб мышления.
+                    </p>
+                </div>
+
+                <!-- Карточка 2 -->
+                <div class="bg-[#F5F2ED] p-12 md:p-20 group relative overflow-hidden reveal transition-colors duration-500 hover:bg-vault-bg">
+                    <div class="text-sm tracking-widest uppercase mb-12 opacity-50">02 / Связи</div>
+                    <h3 class="text-3xl font-serif mb-6 transform group-hover:-translate-y-2 transition-transform duration-500">Нетворкинг</h3>
+                    <p class="text-vault-text font-light leading-relaxed mt-6 md:mt-0 transition-all duration-500 md:absolute md:bottom-20 md:left-20 md:right-20 md:opacity-0 md:transform md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+                        Встречая человека с таким же аксессуаром, вы заранее знаете: перед вами тот, с кем можно говорить на одном языке о бизнесе и развитии.
+                    </p>
+                </div>
+
+                <!-- Карточка 3 -->
+                <div class="bg-[#F5F2ED] p-12 md:p-20 group relative overflow-hidden reveal transition-colors duration-500 hover:bg-vault-bg">
+                    <div class="text-sm tracking-widest uppercase mb-12 opacity-50">03 / Цели</div>
+                    <h3 class="text-3xl font-serif mb-6 transform group-hover:-translate-y-2 transition-transform duration-500">Амбиции</h3>
+                    <p class="text-vault-text font-light leading-relaxed mt-6 md:mt-0 transition-all duration-500 md:absolute md:bottom-20 md:left-20 md:right-20 md:opacity-0 md:transform md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+                        Окружение формирует реальность. Мы создаем артефакт, который напоминает о ваших целях каждый раз, когда вы берете его в руки.
+                    </p>
+                </div>
+
+                <!-- Карточка 4 -->
+                <div class="bg-[#F5F2ED] p-12 md:p-20 group relative overflow-hidden reveal transition-colors duration-500 hover:bg-vault-bg">
+                    <div class="text-sm tracking-widest uppercase mb-12 opacity-50">04 / Уровень</div>
+                    <h3 class="text-3xl font-serif mb-6 transform group-hover:-translate-y-2 transition-transform duration-500">Статус</h3>
+                    <p class="text-vault-text font-light leading-relaxed mt-6 md:mt-0 transition-all duration-500 md:absolute md:bottom-20 md:left-20 md:right-20 md:opacity-0 md:transform md:translate-y-4 md:group-hover:opacity-100 md:group-hover:translate-y-0">
+                        Тихая роскошь, не кричащая логотипами. Статус, который считывается через безупречное качество, форму и глубокий смысл.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. БОЛЬШОЙ ТЕКСТОВЫЙ БЛОК (Манифест) -->
+    <section class="py-32 md:py-48 px-6 flex items-center justify-center text-center reveal">
+        <div class="max-w-5xl">
+            <h2 class="text-4xl md:text-6xl lg:text-7xl font-serif leading-tight">
+                Место для тех, кто ценит <br class="hidden md:block">
+                <span class="italic text-vault-text">тишину, вкус</span> и достойную компанию.
+            </h2>
+        </div>
+    </section>
+
+    <!-- 6 & 7. FAQ (Сообщество и Магазин) -->
+    <section id="faq" class="py-24 px-6 md:px-12 max-w-4xl mx-auto border-t border-vault-line">
+        
+        <div class="mb-20 text-center reveal">
+            <h2 class="text-3xl md:text-4xl font-serif mb-4">Вопросы & Ответы</h2>
+            <p class="text-vault-text font-light">Философия и детали приобретения.</p>
+        </div>
+
+        <div class="space-y-16">
+            
+            <!-- FAQ Сообщества -->
+            <div class="reveal">
+                <h3 class="text-xs tracking-widest uppercase text-vault-text mb-8 opacity-70">О сообществе</h3>
+                <div class="faq-container border-t border-vault-line">
+                    
+                    <!-- Вопрос 1 -->
+                    <div class="faq-item border-b border-vault-line">
+                        <button class="faq-btn w-full py-6 flex justify-between items-center text-left focus:outline-none group">
+                            <span class="font-serif text-xl group-hover:opacity-70 transition-opacity">Что дает покупка картхолдера?</span>
+                            <span class="icon text-2xl transition-transform duration-300 font-light">+</span>
+                        </button>
+                        <div class="faq-content overflow-hidden max-h-0 transition-all duration-500 ease-in-out">
+                            <p class="pb-8 text-vault-text font-light leading-relaxed">
+                                Картхолдер является физическим символом вашей принадлежности к The Vault Club. Он не дает формальных "скидок", но служит маркером "свой-чужой" в деловой среде и открывает двери к неформальному нетворкингу среди резидентов.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Вопрос 2 -->
+                    <div class="faq-item border-b border-vault-line">
+                        <button class="faq-btn w-full py-6 flex justify-between items-center text-left focus:outline-none group">
+                            <span class="font-serif text-xl group-hover:opacity-70 transition-opacity">Как попасть на закрытые мероприятия?</span>
+                            <span class="icon text-2xl transition-transform duration-300 font-light">+</span>
+                        </button>
+                        <div class="faq-content overflow-hidden max-h-0 transition-all duration-500 ease-in-out">
+                            <p class="pb-8 text-vault-text font-light leading-relaxed">
+                                Владельцы картхолдеров получают персональные приглашения на закрытые встречи клуба. Мы отбираем аудиторию так, чтобы каждый участник мог привнести ценность в общение.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- FAQ Магазина -->
+            <div class="reveal">
+                <h3 class="text-xs tracking-widest uppercase text-vault-text mb-8 opacity-70">Заказ и доставка</h3>
+                <div class="faq-container border-t border-vault-line">
+                    
+                    <!-- Вопрос 3 -->
+                    <div class="faq-item border-b border-vault-line">
+                        <button class="faq-btn w-full py-6 flex justify-between items-center text-left focus:outline-none group">
+                            <span class="font-serif text-xl group-hover:opacity-70 transition-opacity">Сроки изготовления и доставки?</span>
+                            <span class="icon text-2xl transition-transform duration-300 font-light">+</span>
+                        </button>
+                        <div class="faq-content overflow-hidden max-h-0 transition-all duration-500 ease-in-out">
+                            <p class="pb-8 text-vault-text font-light leading-relaxed">
+                                Каждый экземпляр собирается вручную. Отправка осуществляется в течение 2-3 рабочих дней после подтверждения заказа. Доставка по РФ занимает от 1 до 5 дней.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Вопрос 4 -->
+                    <div class="faq-item border-b border-vault-line">
+                        <button class="faq-btn w-full py-6 flex justify-between items-center text-left focus:outline-none group">
+                            <span class="font-serif text-xl group-hover:opacity-70 transition-opacity">Предоставляется ли гарантия?</span>
+                            <span class="icon text-2xl transition-transform duration-300 font-light">+</span>
+                        </button>
+                        <div class="faq-content overflow-hidden max-h-0 transition-all duration-500 ease-in-out">
+                            <p class="pb-8 text-vault-text font-light leading-relaxed">
+                                Мы уверены в качестве материалов и работы. На все изделия действует гарантия 1 год на фурнитуру и швы. Естественное старение кожи (патина) не является дефектом, а подчеркивает индивидуальность вещи.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- 8. FOOTER -->
+    <footer class="bg-[#F5F2ED] pt-24 pb-12 px-6 md:px-12 mt-20 relative overflow-hidden">
+        <div class="max-w-[1400px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-24 z-10 relative">
+            
+            <div class="md:col-span-2">
+                <a href="#" class="text-2xl font-serif mb-6 block">The Vault Club</a>
+                <p class="text-vault-text font-light text-sm max-w-xs">
+                    Закрытое сообщество. By invitation only. Артефакты для тех, кто создает будущее.
+                </p>
+            </div>
+
+            <div>
+                <h4 class="text-xs tracking-widest uppercase mb-6 font-medium">Навигация</h4>
+                <ul class="space-y-4 text-vault-text text-sm font-light">
+                    <li><a href="#product" class="hover:text-vault-accent transition-colors">Магазин</a></li>
+                    <li><a href="#values" class="hover:text-vault-accent transition-colors">Философия</a></li>
+                    <li><a href="#faq" class="hover:text-vault-accent transition-colors">FAQ</a></li>
+                    <li><a href="#" class="hover:text-vault-accent transition-colors">Личный кабинет</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="text-xs tracking-widest uppercase mb-6 font-medium">Контакты</h4>
+                <ul class="space-y-4 text-vault-text text-sm font-light">
+                    <li><a href="mailto:concierge@thevault.club" class="hover:text-vault-accent transition-colors">concierge@thevault.club</a></li>
+                    <li><a href="#" class="hover:text-vault-accent transition-colors">Telegram</a></li>
+                    <li><a href="#" class="hover:text-vault-accent transition-colors">Instagram</a></li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-vault-text/60 z-10 relative border-t border-vault-line pt-8">
+            <p>© 2026 The Vault Club. Все права защищены.</p>
+            <div class="space-x-6 mt-4 md:mt-0">
+                <a href="privacy.html" class="hover:text-vault-accent">Политика конфиденциальности</a>
+                <a href="offer.html" class="hover:text-vault-accent">Публичная оферта</a>
+            </div>
+        </div>
+
+        <!-- Огромный водяной знак в фоне футера -->
+        <div class="absolute bottom-[-10%] left-1/2 transform -translate-x-1/2 text-[15vw] font-serif font-bold text-vault-line opacity-30 whitespace-nowrap pointer-events-none select-none">
+            The Vault
+        </div>
+    </footer>
+
+    <!-- КОРЗИНА (Модальное окно) -->
+    <div id="cart-overlay" class="fixed inset-0 bg-vault-bg/95 backdrop-blur-sm z-[100] opacity-0 pointer-events-none transition-opacity duration-500 flex justify-end">
+        
+        <div id="cart-modal" class="w-full md:w-[450px] bg-[#FDFBF7] h-full shadow-2xl border-l border-vault-line transform translate-x-full transition-transform duration-500 ease-premium flex flex-col">
+            
+            <!-- Шапка модалки: общая для обоих экранов, заголовок меняется из JS -->
+            <div class="p-8 border-b border-vault-line flex justify-between items-center flex-shrink-0">
+                <h2 class="font-serif text-2xl" id="cart-modal-title">Ваша корзина</h2>
+                <button id="cart-close-btn" class="text-vault-text hover:text-vault-accent transition-colors">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Трек из двух экранов: «Корзина» и «Оформление». Сдвигается на -100% ширины трека -->
+            <div class="flex-1 overflow-hidden">
+                <!-- Класс transform обязателен: он выставляет дефолты --tw-rotate/--tw-scale-*,
+                     без которых значение transform невалидно и схлопывается в none.
+                     По той же причине он стоит и на #cart-modal. -->
+                <div id="cart-track" class="flex h-full w-full transform transition-transform duration-500 ease-premium">
+
+                    <!-- ЭКРАН 1: Корзина -->
+                    <div id="cart-screen-cart" class="w-full h-full flex-shrink-0 flex flex-col">
+                        <div class="flex-1 p-8 overflow-y-auto" id="cart-items-container">
+                            <!-- Здесь будут товары, генерируемые JS -->
+                            <div class="text-center text-vault-text mt-20 font-light" id="empty-cart-msg">
+                                Ваша корзина пуста.
+                            </div>
+                        </div>
+
+                        <!-- Подвал корзины (Сумма и Кнопки) -->
+                        <div class="p-8 border-t border-vault-line bg-[#F5F2ED] flex-shrink-0">
+                            <div class="flex justify-between items-end mb-8">
+                                <span class="text-sm tracking-widest uppercase opacity-70">Итого:</span>
+                                <span class="text-2xl font-serif" id="cart-total">0 ₽</span>
+                            </div>
+                            <div class="space-y-4">
+                                <button class="w-full py-4 bg-vault-accent text-vault-bg text-sm uppercase tracking-widest hover:bg-opacity-90 transition-colors pointer-events-none opacity-50" id="checkout-btn">
+                                    Оформить заказ
+                                </button>
+                                <button id="continue-shopping-btn" class="w-full py-4 border border-vault-accent text-vault-accent text-sm uppercase tracking-widest hover:bg-vault-accent hover:text-vault-bg transition-colors">
+                                    Продолжить покупки
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ЭКРАН 2: Оформление -->
+                    <div id="cart-screen-checkout" class="w-full h-full flex-shrink-0 flex flex-col" inert>
+                        <div class="flex-1 overflow-y-auto">
+
+                            <!-- Назад к корзине -->
+                            <button id="back-to-cart-btn" type="button"
+                                    class="w-full px-8 py-5 border-b border-vault-line flex items-center gap-3 text-xs tracking-widest uppercase text-vault-text hover:text-vault-accent transition-colors">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M15 18l-6-6 6-6"/>
+                                </svg>
+                                Назад к корзине
+                            </button>
+
+                            <form id="checkout-form" class="p-8 space-y-6" novalidate>
+                                <div>
+                                    <label for="co-name" class="block text-xs tracking-widest uppercase opacity-70 mb-2">Полное имя</label>
+                                    <input type="text" id="co-name" name="fullName" class="vault-input" autocomplete="name" maxlength="100" required>
+                                    <p class="field-error" data-error-for="co-name"></p>
+                                </div>
+
+                                <div>
+                                    <label for="co-phone" class="block text-xs tracking-widest uppercase opacity-70 mb-2">Телефон</label>
+                                    <input type="tel" id="co-phone" name="phone" class="vault-input" autocomplete="tel" placeholder="+7 (___) ___-__-__" required>
+                                    <p class="field-error" data-error-for="co-phone"></p>
+                                </div>
+
+                                <div>
+                                    <label for="co-email" class="block text-xs tracking-widest uppercase opacity-70 mb-2">Email</label>
+                                    <input type="email" id="co-email" name="email" class="vault-input" autocomplete="email" maxlength="254" required>
+                                    <p class="field-error" data-error-for="co-email"></p>
+                                </div>
+
+                                <div>
+                                    <label for="co-telegram" class="block text-xs tracking-widest uppercase opacity-70 mb-2">
+                                        Telegram <span class="normal-case tracking-normal opacity-60">— необязательно</span>
+                                    </label>
+                                    <input type="text" id="co-telegram" name="telegram" class="vault-input" placeholder="@username" maxlength="64">
+                                    <p class="field-error" data-error-for="co-telegram"></p>
+                                </div>
+
+                                <div>
+                                    <label for="co-comment" class="block text-xs tracking-widest uppercase opacity-70 mb-2">
+                                        Комментарий к заказу <span class="normal-case tracking-normal opacity-60">— необязательно</span>
+                                    </label>
+                                    <textarea id="co-comment" name="comment" rows="3" maxlength="500" class="vault-input resize-none"></textarea>
+                                    <div class="flex justify-end mt-1">
+                                        <span class="text-xs opacity-50"><span id="co-comment-count">0</span> / 500</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="flex items-start gap-3 cursor-pointer">
+                                        <input type="checkbox" id="co-consent" name="consent" class="vault-checkbox mt-0.5 flex-shrink-0" required>
+                                        <span class="text-xs leading-relaxed text-vault-text/80">
+                                            Согласен на обработку персональных данных в соответствии с
+                                            <a href="privacy.html" target="_blank" class="text-vault-accent underline underline-offset-2 hover:opacity-70">политикой конфиденциальности</a>
+                                        </span>
+                                    </label>
+                                    <p class="field-error" data-error-for="co-consent"></p>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Подвал оформления -->
+                        <div class="p-8 border-t border-vault-line bg-[#F5F2ED] flex-shrink-0">
+                            <div class="flex justify-between items-end mb-6">
+                                <span class="text-sm tracking-widest uppercase opacity-70">К оплате:</span>
+                                <span class="text-2xl font-serif" id="checkout-total">0 ₽</span>
+                            </div>
+                            <!-- Общая ошибка запроса (сеть, 400/500 от API) -->
+                            <p id="checkout-form-error" class="field-error mb-4"></p>
+                            <button type="submit" form="checkout-form" id="pay-btn"
+                                    class="w-full py-4 bg-vault-accent text-vault-bg text-sm uppercase tracking-widest hover:bg-opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span id="pay-btn-label">Перейти к оплате</span>
+                            </button>
+                            <p class="text-[10px] text-center text-vault-text/50 mt-4 leading-relaxed">
+                                Оплата картой через ЮKassa. Нажимая кнопку, вы принимаете
+                                <a href="offer.html" target="_blank" class="underline underline-offset-2 hover:text-vault-accent">публичную оферту</a>.
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT ЛОГИКА -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            /* --- 1. Анимация появления элементов (Intersection Observer) --- */
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        observer.unobserve(entry.target); // Анимируем только один раз
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+
+            /* --- 2. Эффект скролла для Header --- */
+            const header = document.getElementById('main-header');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    header.classList.add('py-4', 'border-vault-line');
+                    header.classList.remove('py-6', 'border-transparent');
+                } else {
+                    header.classList.add('py-6', 'border-transparent');
+                    header.classList.remove('py-4', 'border-vault-line');
+                }
+            });
+
+
+            /* --- 3. Логика карточки товара (Выбор цвета и Количество) --- */
+            const colorRadios = document.querySelectorAll('.color-radio');
+            const mainImage = document.getElementById('main-product-image');
+            const colorNameDisplay = document.getElementById('color-name-display');
+            
+            const qtyMinus = document.getElementById('qty-minus');
+            const qtyPlus = document.getElementById('qty-plus');
+            const qtyValueDisplay = document.getElementById('qty-value');
+            
+            let currentQty = 1;
+
+            /* --- Справочник товаров на клиенте ---
+               ВНИМАНИЕ: price здесь ТОЛЬКО для отображения витрины и корзины.
+               Настоящая цена живёт в api/_lib/catalog.js, на сервер уходит лишь {sku, qty}.
+               Правка этого объекта через DevTools изменит только картинку на экране —
+               сумма платежа считается заново на бэкенде.
+               Новый цвет = новая запись здесь + новый radio с data-sku. */
+            const PRODUCTS = {
+                'cardholder-vault-white': {
+                    title: 'Cardholder Vault',
+                    color: 'Белый',
+                    img: 'assets/img/img-01-52614c96.webp',
+                    price: 15000, // рубли, для витрины
+                },
+            };
+
+            // Верхний предел количества одной позиции. Сервер допускает до 99, клиент строже.
+            const MAX_QTY_PER_ITEM = 10;
+
+            // Смена изображения и названия цвета
+            colorRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    const product = PRODUCTS[e.target.dataset.sku];
+                    if (!product) return;
+                    const newImgSrc = product.img;
+                    const newColorName = e.target.value;
+                    
+                    // Плавная смена через opacity
+                    mainImage.style.opacity = 0;
+                    
+                    setTimeout(() => {
+                        mainImage.src = newImgSrc;
+                        colorNameDisplay.textContent = newColorName;
+                        mainImage.style.opacity = 1;
+                    }, 300); // время должно совпадать с duration в CSS
+                });
+            });
+
+            // Управление количеством
+            qtyMinus.addEventListener('click', () => {
+                if (currentQty > 1) {
+                    currentQty--;
+                    qtyValueDisplay.textContent = currentQty;
+                }
+            });
+
+            qtyPlus.addEventListener('click', () => {
+                if (currentQty < MAX_QTY_PER_ITEM) {
+                    currentQty++;
+                    qtyValueDisplay.textContent = currentQty;
+                }
+            });
+
+
+            /* --- 3.5 Галерея (Карусель) --- */
+            const galleryTrack = document.getElementById('gallery-track');
+            const galleryPrev = document.getElementById('gallery-prev');
+            const galleryNext = document.getElementById('gallery-next');
+
+            if (galleryTrack && galleryPrev && galleryNext) {
+                // Прокрутка на ширину одного фото + отступ
+                const getScrollStep = () => {
+                    const firstItem = galleryTrack.querySelector('div');
+                    if (!firstItem) return galleryTrack.clientWidth;
+                    const gap = parseFloat(getComputedStyle(galleryTrack).columnGap || 0) || 24;
+                    return firstItem.offsetWidth + gap;
+                };
+
+                galleryNext.addEventListener('click', () => {
+                    galleryTrack.scrollBy({ left: getScrollStep(), behavior: 'smooth' });
+                });
+
+                galleryPrev.addEventListener('click', () => {
+                    galleryTrack.scrollBy({ left: -getScrollStep(), behavior: 'smooth' });
+                });
+            }
+
+
+            /* --- 4. Логика FAQ (Аккордеон) --- */
+            const faqButtons = document.querySelectorAll('.faq-btn');
+            
+            faqButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('.icon');
+                    
+                    // Закрываем все остальные открытые (опционально, для чистоты)
+                    // faqButtons.forEach(otherBtn => {
+                    //     if (otherBtn !== this) {
+                    //         otherBtn.nextElementSibling.style.maxHeight = null;
+                    //         otherBtn.querySelector('.icon').style.transform = 'rotate(0deg)';
+                    //     }
+                    // });
+
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        icon.style.transform = 'rotate(45deg)'; // Крестик
+                    }
+                });
+            });
+
+
+            /* --- 5. Логика Корзины --- */
+            const cartOpenBtn = document.getElementById('cart-open-btn');
+            const cartCloseBtn = document.getElementById('cart-close-btn');
+            const continueShoppingBtn = document.getElementById('continue-shopping-btn');
+            const cartOverlay = document.getElementById('cart-overlay');
+            const cartModal = document.getElementById('cart-modal');
+            const addToCartBtn = document.getElementById('add-to-cart-btn');
+            
+            const cartItemsContainer = document.getElementById('cart-items-container');
+            const emptyCartMsg = document.getElementById('empty-cart-msg');
+            const cartTotalDisplay = document.getElementById('cart-total');
+            const checkoutTotalDisplay = document.getElementById('checkout-total');
+            const cartCountHeader = document.getElementById('cart-count');
+            const checkoutBtn = document.getElementById('checkout-btn');
+
+            /* Позиция корзины — это {sku, color, qty}. Ни цены, ни картинки в состоянии:
+               картинку берём из PRODUCTS по sku, цену считает сервер. */
+            let cartData = [];
+
+            // Какой из двух экранов модалки сейчас показан
+            let isCheckoutScreen = false;
+
+            /* --- Сохранение корзины между загрузками страницы ---
+               Обязательно: покупатель уходит на страницу оплаты ЮKassa
+               и возвращается уже новой загрузкой сайта. */
+            const CART_STORAGE_KEY = 'vault_cart_v1';
+
+            function saveCart() {
+                try {
+                    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
+                } catch (e) {
+                    // Приватный режим или переполненное хранилище: корзина просто не переживёт перезагрузку
+                    console.warn('Не удалось сохранить корзину:', e);
+                }
+            }
+
+            function loadCart() {
+                let raw;
+                try {
+                    raw = localStorage.getItem(CART_STORAGE_KEY);
+                } catch (e) {
+                    return []; // localStorage недоступен целиком
+                }
+                if (!raw) return [];
+
+                try {
+                    const parsed = JSON.parse(raw);
+                    if (!Array.isArray(parsed)) throw new Error('ожидался массив');
+
+                    // Отбрасываем мусор и позиции с неизвестным sku (например, товар убрали из каталога)
+                    return parsed
+                        .filter(item => item && typeof item.sku === 'string' && PRODUCTS[item.sku])
+                        .map(item => ({
+                            sku: item.sku,
+                            color: PRODUCTS[item.sku].color,
+                            qty: Math.min(MAX_QTY_PER_ITEM, Math.max(1, parseInt(item.qty, 10) || 1)),
+                        }));
+                } catch (e) {
+                    // Повреждённые данные — чистим и начинаем с пустой корзины
+                    console.warn('Корзина в localStorage повреждена, очищаю:', e);
+                    try { localStorage.removeItem(CART_STORAGE_KEY); } catch (_) {}
+                    return [];
+                }
+            }
+
+            // Функции открытия/закрытия
+            function openCart() {
+                cartOverlay.classList.remove('opacity-0', 'pointer-events-none');
+                cartModal.classList.remove('translate-x-full');
+                document.body.style.overflow = 'hidden'; // Блокируем скролл страницы
+            }
+
+            function closeCart() {
+                cartOverlay.classList.add('opacity-0', 'pointer-events-none');
+                cartModal.classList.add('translate-x-full');
+                document.body.style.overflow = '';
+            }
+
+            cartOpenBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                openCart();
+            });
+            cartCloseBtn.addEventListener('click', closeCart);
+            continueShoppingBtn.addEventListener('click', closeCart);
+            
+            // Закрытие по клику вне модалки
+            cartOverlay.addEventListener('click', (e) => {
+                if (e.target === cartOverlay) closeCart();
+            });
+
+            // Форматирование цены
+            const formatPrice = (price) => {
+                return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₽";
+            };
+
+            // Обновление UI корзины
+            function renderCart() {
+                cartItemsContainer.innerHTML = '';
+                let total = 0;
+                let totalItems = 0;
+
+                if (cartData.length === 0) {
+                    cartItemsContainer.appendChild(emptyCartMsg);
+                    emptyCartMsg.style.display = 'block';
+                    checkoutBtn.classList.add('pointer-events-none', 'opacity-50');
+                } else {
+                    emptyCartMsg.style.display = 'none';
+                    checkoutBtn.classList.remove('pointer-events-none', 'opacity-50');
+
+                    cartData.forEach((item) => {
+                        const product = PRODUCTS[item.sku];
+                        const lineTotal = product.price * item.qty;
+                        total += lineTotal;
+                        totalItems += item.qty;
+
+                        // Позиции адресуются по data-sku: индексы массива разъезжаются при перерисовке
+                        const itemHTML = `
+                            <div class="flex items-center space-x-6 mb-8 pb-8 border-b border-vault-line last:border-0 last:pb-0 last:mb-0">
+                                <div class="w-24 h-32 bg-[#F5F2ED] flex-shrink-0">
+                                    <img src="${product.img}" alt="${product.title}" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-serif text-lg mb-1">${product.title}</h4>
+                                    <p class="text-xs text-vault-text/70 uppercase tracking-widest mb-3">${item.color}</p>
+                                    <div class="flex justify-between items-center">
+                                        <div class="flex items-center border border-vault-line h-9">
+                                            <button class="cart-qty-minus w-8 h-full text-vault-text hover:text-vault-accent transition-colors" data-sku="${item.sku}" aria-label="Уменьшить количество">-</button>
+                                            <span class="w-8 text-center text-sm font-medium text-vault-text">${item.qty}</span>
+                                            <button class="cart-qty-plus w-8 h-full text-vault-text hover:text-vault-accent transition-colors" data-sku="${item.sku}" aria-label="Увеличить количество">+</button>
+                                        </div>
+                                        <div class="text-sm">${formatPrice(lineTotal)}</div>
+                                    </div>
+                                </div>
+                                <button class="remove-item text-vault-text/50 hover:text-vault-accent transition-colors" data-sku="${item.sku}" aria-label="Удалить позицию">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                        `;
+                        cartItemsContainer.insertAdjacentHTML('beforeend', itemHTML);
+                    });
+                }
+
+                cartTotalDisplay.textContent = formatPrice(total);
+                checkoutTotalDisplay.textContent = formatPrice(total);
+                cartCountHeader.textContent = totalItems;
+                saveCart();
+
+                // Опустошили корзину, стоя на экране оформления — возвращаем назад
+                if (cartData.length === 0 && isCheckoutScreen) showCartScreen();
+            }
+
+            /* Делегирование вместо навешивания обработчиков на каждой перерисовке.
+               Слушатель один, узлы внутри контейнера могут пересоздаваться сколько угодно. */
+            cartItemsContainer.addEventListener('click', (e) => {
+                const btn = e.target.closest('button[data-sku]');
+                if (!btn || !cartItemsContainer.contains(btn)) return;
+
+                const index = cartData.findIndex(item => item.sku === btn.dataset.sku);
+                if (index === -1) return;
+
+                if (btn.classList.contains('remove-item')) {
+                    cartData.splice(index, 1);
+                } else if (btn.classList.contains('cart-qty-plus')) {
+                    if (cartData[index].qty >= MAX_QTY_PER_ITEM) return;
+                    cartData[index].qty++;
+                } else if (btn.classList.contains('cart-qty-minus')) {
+                    if (cartData[index].qty <= 1) return; // ниже единицы не опускаемся, для удаления есть крестик
+                    cartData[index].qty--;
+                } else {
+                    return;
+                }
+
+                renderCart();
+            });
+
+            // Добавление в корзину
+            addToCartBtn.addEventListener('click', () => {
+                const selectedColor = document.querySelector('input[name="color"]:checked');
+                const sku = selectedColor && selectedColor.dataset.sku;
+                if (!sku || !PRODUCTS[sku]) return;
+
+                // Одинаковый sku складываем в одну позицию, не превышая предел количества
+                const existingItemIndex = cartData.findIndex(item => item.sku === sku);
+
+                if (existingItemIndex > -1) {
+                    cartData[existingItemIndex].qty = Math.min(
+                        MAX_QTY_PER_ITEM,
+                        cartData[existingItemIndex].qty + currentQty
+                    );
+                } else {
+                    cartData.push({ sku, color: PRODUCTS[sku].color, qty: currentQty });
+                }
+
+                renderCart();
+                
+                // Визуальный фидбек на кнопке
+                const originalText = addToCartBtn.querySelector('span').textContent;
+                addToCartBtn.querySelector('span').textContent = 'Добавлено';
+                
+                setTimeout(() => {
+                    addToCartBtn.querySelector('span').textContent = originalText;
+                    openCart(); // Открываем корзину после добавления
+                    
+                    // Сбрасываем счетчик обратно на 1
+                    currentQty = 1;
+                    qtyValueDisplay.textContent = currentQty;
+                }, 800);
+            });
+
+
+            /* --- 6. Экран оформления заказа --- */
+            const cartTrack = document.getElementById('cart-track');
+            const cartScreenCart = document.getElementById('cart-screen-cart');
+            const cartScreenCheckout = document.getElementById('cart-screen-checkout');
+            const cartModalTitle = document.getElementById('cart-modal-title');
+            const backToCartBtn = document.getElementById('back-to-cart-btn');
+            const checkoutForm = document.getElementById('checkout-form');
+            const checkoutFormError = document.getElementById('checkout-form-error');
+            const payBtn = document.getElementById('pay-btn');
+            const payBtnLabel = document.getElementById('pay-btn-label');
+
+            const nameInput = document.getElementById('co-name');
+            const phoneInput = document.getElementById('co-phone');
+            const emailInput = document.getElementById('co-email');
+            const telegramInput = document.getElementById('co-telegram');
+            const commentInput = document.getElementById('co-comment');
+            const commentCount = document.getElementById('co-comment-count');
+            const consentInput = document.getElementById('co-consent');
+
+            // paymentId нужен success.html, чтобы перепроверить статус после возврата от ЮKassa
+            const PAYMENT_STORAGE_KEY = 'vault_last_payment_v1';
+
+            let isSubmitting = false;
+
+            function showCheckoutScreen() {
+                if (cartData.length === 0) return;
+                isCheckoutScreen = true;
+                cartTrack.classList.add('-translate-x-full');
+                cartModalTitle.textContent = 'Оформление';
+                // inert убирает уехавший за край экран из таб-порядка и из дерева доступности
+                cartScreenCart.setAttribute('inert', '');
+                cartScreenCheckout.removeAttribute('inert');
+            }
+
+            function showCartScreen() {
+                isCheckoutScreen = false;
+                cartTrack.classList.remove('-translate-x-full');
+                cartModalTitle.textContent = 'Ваша корзина';
+                cartScreenCheckout.setAttribute('inert', '');
+                cartScreenCart.removeAttribute('inert');
+            }
+
+            checkoutBtn.addEventListener('click', showCheckoutScreen);
+            backToCartBtn.addEventListener('click', showCartScreen);
+
+            /* --- Маска телефона +7 (___) ___-__-__, без библиотек ---
+               В состоянии держим только 10 цифр номера, строку собираем заново на каждый ввод. */
+            function phoneDigits(value) {
+                let digits = value.replace(/\D/g, '');
+                // 8XXXXXXXXXX и 7XXXXXXXXXX приводим к одному виду — код страны отбрасываем
+                if (digits.startsWith('7') || digits.startsWith('8')) digits = digits.slice(1);
+                return digits.slice(0, 10);
+            }
+
+            function formatPhone(digits) {
+                let out = '+7';
+                if (digits.length > 0) out += ' (' + digits.slice(0, 3);
+                // Закрывающая скобка появляется только с 4-й цифрой, иначе backspace «залипает»
+                if (digits.length > 3) out += ') ' + digits.slice(3, 6);
+                if (digits.length > 6) out += '-' + digits.slice(6, 8);
+                if (digits.length > 8) out += '-' + digits.slice(8, 10);
+                return out;
+            }
+
+            phoneInput.addEventListener('input', () => {
+                const digits = phoneDigits(phoneInput.value);
+                phoneInput.value = digits.length ? formatPhone(digits) : '';
+                // Маска пересобирает строку целиком, поэтому каретка всегда в конце
+                phoneInput.setSelectionRange(phoneInput.value.length, phoneInput.value.length);
+            });
+            phoneInput.addEventListener('focus', () => {
+                if (!phoneInput.value) phoneInput.value = '+7 (';
+            });
+            phoneInput.addEventListener('blur', () => {
+                if (phoneDigits(phoneInput.value).length === 0) phoneInput.value = '';
+            });
+
+            // Счётчик символов комментария
+            commentInput.addEventListener('input', () => {
+                commentCount.textContent = commentInput.value.length;
+            });
+
+            /* --- Валидация формы ---
+               Дублирует серверную из api/_lib/validate.js: клиент для удобства, сервер для правды. */
+            const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+            const TELEGRAM_RE = /^[A-Za-z0-9_]{5,32}$/;
+
+            function normalizeTelegram(value) {
+                return value.trim()
+                    .replace(/^https?:\/\//i, '')
+                    .replace(/^t\.me\//i, '')
+                    .replace(/^@/, '');
+            }
+
+            function setFieldError(input, message) {
+                const box = checkoutForm.querySelector(`[data-error-for="${input.id}"]`);
+                if (box) {
+                    box.textContent = message || '';
+                    box.classList.toggle('is-visible', Boolean(message));
+                }
+                input.classList.toggle('has-error', Boolean(message));
+            }
+
+            // Ошибка гаснет, как только человек начал править поле
+            [nameInput, phoneInput, emailInput, telegramInput].forEach(input => {
+                input.addEventListener('input', () => setFieldError(input, ''));
+            });
+            consentInput.addEventListener('change', () => setFieldError(consentInput, ''));
+
+            function validateCheckout() {
+                let firstInvalid = null;
+                const fail = (input, message) => {
+                    setFieldError(input, message);
+                    if (!firstInvalid) firstInvalid = input;
+                };
+
+                setFieldError(nameInput, '');
+                const name = nameInput.value.trim();
+                if (name.length < 2 || name.length > 100) {
+                    fail(nameInput, 'Укажите имя — от 2 до 100 символов');
+                }
+
+                setFieldError(phoneInput, '');
+                if (phoneDigits(phoneInput.value).length !== 10) {
+                    fail(phoneInput, 'Телефон в формате +7 (___) ___-__-__');
+                }
+
+                setFieldError(emailInput, '');
+                const email = emailInput.value.trim();
+                if (!email || email.length > 254 || !EMAIL_RE.test(email)) {
+                    fail(emailInput, 'Проверьте адрес почты');
+                }
+
+                setFieldError(telegramInput, '');
+                const telegram = normalizeTelegram(telegramInput.value);
+                if (telegram && !TELEGRAM_RE.test(telegram)) {
+                    fail(telegramInput, 'Ник из латиницы, цифр и _, от 5 до 32 символов');
+                }
+
+                setFieldError(consentInput, '');
+                if (!consentInput.checked) {
+                    fail(consentInput, 'Без согласия оформить заказ нельзя');
+                }
+
+                return firstInvalid;
+            }
+
+            function setSubmitting(state) {
+                isSubmitting = state;
+                payBtn.disabled = state;
+                payBtnLabel.textContent = state ? 'Переходим к оплате…' : 'Перейти к оплате';
+            }
+
+            checkoutForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (isSubmitting) return;
+
+                checkoutFormError.classList.remove('is-visible');
+
+                const firstInvalid = validateCheckout();
+                if (firstInvalid) {
+                    firstInvalid.focus();
+                    return;
+                }
+                if (cartData.length === 0) {
+                    showCartScreen();
+                    return;
+                }
+
+                setSubmitting(true);
+
+                try {
+                    const response = await fetch('/api/create-payment', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            // Наружу уходят только sku и количество — сумму считает сервер
+                            items: cartData.map(({ sku, qty }) => ({ sku, qty })),
+                            customer: {
+                                fullName: nameInput.value.trim(),
+                                phone: '+7' + phoneDigits(phoneInput.value),
+                                email: emailInput.value.trim(),
+                                telegram: normalizeTelegram(telegramInput.value),
+                            },
+                            comment: commentInput.value.trim(),
+                            consent: consentInput.checked,
+                        }),
+                    });
+
+                    const data = await response.json().catch(() => ({}));
+
+                    if (!response.ok || !data.confirmationUrl) {
+                        throw new Error(data.error || 'Не удалось создать платёж. Попробуйте ещё раз.');
+                    }
+
+                    try {
+                        localStorage.setItem(PAYMENT_STORAGE_KEY, data.paymentId);
+                    } catch (_) {
+                        // не критично: success.html просто не сможет перепроверить статус
+                    }
+
+                    // Уходим на страницу оплаты ЮKassa. Корзина остаётся в localStorage
+                    // и переживёт возврат — чистим её только при подтверждённой оплате.
+                    window.location.href = data.confirmationUrl;
+                } catch (err) {
+                    console.error('Ошибка оформления заказа:', err);
+                    checkoutFormError.textContent = err.message || 'Что-то пошло не так. Попробуйте ещё раз.';
+                    checkoutFormError.classList.add('is-visible');
+                    setSubmitting(false);
+                }
+            });
+
+            // Восстанавливаем корзину после возврата со страницы оплаты
+            cartData = loadCart();
+            renderCart();
+
+        });
+    </script>
+</body>
+</html>

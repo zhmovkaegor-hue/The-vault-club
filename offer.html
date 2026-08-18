@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Публичная оферта | The Vault Club</title>
+
+    <link rel="stylesheet" href="assets/fonts.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/theme.js"></script>
+
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #D85427;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #FDFBF7; }
+        ::-webkit-scrollbar-thumb { background: #D85427; }
+
+        /* Заглушки под реквизиты. Заметно на странице, чтобы не уехало в прод незаполненным. */
+        .fill-me {
+            background-color: rgba(216, 84, 39, 0.08);
+            border-bottom: 1px dashed #D85427;
+            padding: 0 0.25rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="font-sans text-vault-accent min-h-screen flex flex-col">
+
+    <header class="w-full py-6 px-6 md:px-12 border-b border-vault-line flex justify-center">
+        <a href="index.html" class="text-2xl sm:text-3xl md:text-4xl font-serif tracking-tight">The Vault Club</a>
+    </header>
+
+    <main class="flex-1 px-6 md:px-12 py-16 md:py-24">
+        <article class="max-w-3xl mx-auto">
+
+            <div class="text-xs tracking-widest uppercase opacity-50 mb-6">Правовая информация</div>
+            <h1 class="text-4xl md:text-5xl font-serif leading-tight mb-6">Публичная оферта</h1>
+            <div class="w-16 h-[1px] bg-vault-accent mb-8"></div>
+            <p class="text-xs tracking-widest uppercase opacity-60 mb-16">
+                Редакция от <span class="fill-me">[[ЗАПОЛНИТЬ: дата]]</span>
+            </p>
+
+            <div class="space-y-14 text-vault-text font-light leading-relaxed">
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">1. Общие положения</h2>
+                    <p class="mb-4">
+                        Настоящий документ является публичной офертой
+                        <span class="fill-me">[[ЗАПОЛНИТЬ: полное наименование / ФИО ИП]]</span>
+                        (далее — Продавец) и содержит все существенные условия договора
+                        розничной купли-продажи товара дистанционным способом.
+                    </p>
+                    <p class="mb-4">
+                        Реквизиты Продавца:
+                        ИНН <span class="fill-me">[[ЗАПОЛНИТЬ: ИНН]]</span>,
+                        ОГРН/ОГРНИП <span class="fill-me">[[ЗАПОЛНИТЬ: ОГРН]]</span>,
+                        адрес: <span class="fill-me">[[ЗАПОЛНИТЬ: адрес]]</span>,
+                        телефон: <span class="fill-me">[[ЗАПОЛНИТЬ: телефон]]</span>,
+                        электронная почта: <span class="fill-me">[[ЗАПОЛНИТЬ: e-mail]]</span>.
+                    </p>
+                    <p>
+                        Оформление заказа и его оплата означают полное и безоговорочное принятие
+                        условий настоящей оферты (акцепт).
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">2. Предмет договора</h2>
+                    <p>
+                        Продавец обязуется передать в собственность Покупателя товар —
+                        картхолдер Cardholder Vault, а Покупатель обязуется принять товар
+                        и оплатить его на условиях настоящей оферты. Описание, характеристики
+                        и изображения товара размещены на Сайте.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">3. Цена и порядок оплаты</h2>
+                    <p class="mb-4">
+                        Цена товара указана на Сайте в рублях Российской Федерации и составляет
+                        15 000 ₽ за единицу. Продавец вправе изменять цену в одностороннем порядке;
+                        цена заказа фиксируется в момент его оформления.
+                    </p>
+                    <p class="mb-4">
+                        Оплата производится в размере 100% предоплаты банковской картой через
+                        платёжный сервис ЮKassa (ООО НКО «ЮMoney»). Реквизиты карты вводятся
+                        на защищённой странице платёжного сервиса и Продавцу не передаются.
+                    </p>
+                    <p>
+                        Кассовый чек направляется Покупателю на указанный им адрес электронной почты.
+                        <span class="fill-me">[[ЗАПОЛНИТЬ: применяемая система налогообложения и ставка НДС —
+                        от этого зависит vat_code в api/_lib/catalog.js]]</span>
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">4. Доставка</h2>
+                    <p>
+                        <span class="fill-me">[[ЗАПОЛНИТЬ: способы доставки, сроки изготовления и отправки,
+                        стоимость доставки, регионы, момент перехода риска случайной гибели товара]]</span>
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">5. Возврат товара</h2>
+                    <p class="mb-4">
+                        Покупатель вправе отказаться от товара в любое время до его передачи,
+                        а после передачи — в течение 7 дней, в соответствии со статьёй 26.1
+                        Закона РФ «О защите прав потребителей».
+                    </p>
+                    <p>
+                        <span class="fill-me">[[ЗАПОЛНИТЬ: порядок возврата — куда обращаться, срок возврата
+                        денежных средств, кто оплачивает обратную пересылку, требования к сохранности
+                        товарного вида]]</span>
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">6. Ответственность сторон</h2>
+                    <p>
+                        Стороны несут ответственность в соответствии с законодательством Российской Федерации.
+                        Продавец не несёт ответственности за ненадлежащее исполнение заказа, если Покупатель
+                        указал недостоверные данные при оформлении.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">7. Персональные данные</h2>
+                    <p>
+                        Обработка персональных данных Покупателя осуществляется в соответствии с
+                        <a href="privacy.html" class="text-vault-accent underline underline-offset-2 hover:opacity-70">Политикой обработки персональных данных</a>.
+                    </p>
+                </section>
+
+                <section>
+                    <h2 class="font-serif text-2xl mb-5 text-vault-accent">8. Разрешение споров</h2>
+                    <p>
+                        <span class="fill-me">[[ЗАПОЛНИТЬ: претензионный порядок, срок ответа на претензию,
+                        подсудность]]</span>
+                    </p>
+                </section>
+
+            </div>
+
+            <div class="mt-20 pt-10 border-t border-vault-line">
+                <a href="index.html" class="text-xs tracking-widest uppercase hover:opacity-60 transition-opacity">
+                    ← Вернуться в магазин
+                </a>
+            </div>
+
+        </article>
+    </main>
+
+    <footer class="border-t border-vault-line py-8 px-6 md:px-12">
+        <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-vault-text/60">
+            <p>© 2026 The Vault Club. Все права защищены.</p>
+            <div class="space-x-6 mt-4 md:mt-0">
+                <a href="privacy.html" class="hover:text-vault-accent">Политика конфиденциальности</a>
+                <a href="offer.html" class="hover:text-vault-accent">Публичная оферта</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

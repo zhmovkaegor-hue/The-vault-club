@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Оплата не прошла | The Vault Club</title>
+
+    <link rel="stylesheet" href="assets/fonts.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="assets/theme.js"></script>
+
+    <style>
+        body {
+            background-color: #FDFBF7;
+            color: #D85427;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #FDFBF7; }
+        ::-webkit-scrollbar-thumb { background: #D85427; }
+    </style>
+</head>
+<body class="font-sans text-vault-accent min-h-screen flex flex-col">
+
+    <header class="w-full py-6 px-6 md:px-12 border-b border-vault-line flex justify-center">
+        <a href="index.html" class="text-2xl sm:text-3xl md:text-4xl font-serif tracking-tight">The Vault Club</a>
+    </header>
+
+    <main class="flex-1 flex items-center justify-center px-6 py-20">
+        <div class="max-w-xl w-full text-center">
+
+            <div class="text-xs tracking-widest uppercase opacity-50 mb-8">Платёж не завершён</div>
+
+            <h1 class="text-4xl md:text-6xl font-serif leading-tight mb-8">
+                Оплата<br><span class="italic text-vault-text">не прошла.</span>
+            </h1>
+
+            <div class="w-16 h-[1px] bg-vault-accent mx-auto mb-10"></div>
+
+            <p class="text-vault-text/80 font-light leading-relaxed mb-4">
+                Платёж был отменён или отклонён банком. Деньги не списаны.
+            </p>
+            <!-- Корзину здесь НЕ чистим: покупатель вернётся к уже собранному заказу -->
+            <p class="text-vault-text/80 font-light leading-relaxed mb-12">
+                Ваша корзина сохранена — можно попробовать оплатить ещё раз.
+            </p>
+
+            <a href="index.html" class="inline-block bg-vault-accent text-vault-bg px-10 py-4 text-sm tracking-widest uppercase hover:bg-opacity-90 transition-all duration-300 transform hover:-translate-y-1">
+                Вернуться в магазин
+            </a>
+
+            <p class="text-xs text-vault-text/50 mt-10 leading-relaxed">
+                Если деньги всё же списались, напишите нам на
+                <a href="mailto:concierge@thevault.club" class="underline underline-offset-2 hover:text-vault-accent">concierge@thevault.club</a>
+            </p>
+
+        </div>
+    </main>
+
+    <footer class="border-t border-vault-line py-8 px-6 md:px-12">
+        <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center text-xs text-vault-text/60">
+            <p>© 2026 The Vault Club. Все права защищены.</p>
+            <div class="space-x-6 mt-4 md:mt-0">
+                <a href="privacy.html" class="hover:text-vault-accent">Политика конфиденциальности</a>
+                <a href="offer.html" class="hover:text-vault-accent">Публичная оферта</a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

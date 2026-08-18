@@ -1,0 +1,13 @@
+{
+  "name": "the-vault-club",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "dev:local": "node --env-file=.env.local scripts/dev-server.mjs",
+    "check:telegram": "node --env-file=.env.local scripts/check-telegram.mjs"
+  }
+}
